@@ -120,10 +120,9 @@ foreach ($stage in $stages) {
     git -c user.name="Costas Pinto" -c user.email="costaspinto312@gmail.com" commit -m $stage.Message
     if ($LASTEXITCODE -ne 0) { throw "Commit failed: $($stage.Message)" }
 }
-git ls-files --error-unmatch .env 2>$null | Out-Null
-$EnvTrackedExitCode = $LASTEXITCODE
-if ($EnvTrackedExitCode -eq 0) {
-    throw ".env is tracked by Git. Remove it from the index before continuing; do not publish secrets."
+$TrackedEnv = @(git ls-files -- .env)
+if ($TrackedEnv -contains ".env") {
+    throw ".env is tracked by Git. Stop before publishing to protect secrets."
 }
 if ($LASTEXITCODE -eq 0) { throw "Safety stop: .env is tracked. Do not publish." }
 
@@ -147,4 +146,5 @@ Write-Host "JUnit report: artifacts\pytest-junit.xml"
 git status --short
 git log --oneline --max-count=8
 git remote -v
+
 
