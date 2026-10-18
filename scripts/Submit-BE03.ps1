@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidatePattern('^[a-zA-Z0-9._-]+$')]
     [string]$RepoName = "flyrank-be03-auth-login-protect",
@@ -61,7 +61,7 @@ $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"
 # BE-03 Submission Evidence
 
 - Generated: $timestamp
-- Project: FlyRank BE-03 — Auth: Login & Protect
+- Project: FlyRank BE-03 â€” Auth: Login & Protect
 - Runtime: $pythonVersion
 - Git: $gitVersion
 - Automated tests: PASS
@@ -120,7 +120,11 @@ foreach ($stage in $stages) {
     git -c user.name="Costas Pinto" -c user.email="costaspinto312@gmail.com" commit -m $stage.Message
     if ($LASTEXITCODE -ne 0) { throw "Commit failed: $($stage.Message)" }
 }
-git ls-files --error-unmatch .env *> $null
+git ls-files --error-unmatch .env 2>$null | Out-Null
+$EnvTrackedExitCode = $LASTEXITCODE
+if ($EnvTrackedExitCode -eq 0) {
+    throw ".env is tracked by Git. Remove it from the index before continuing; do not publish secrets."
+}
 if ($LASTEXITCODE -eq 0) { throw "Safety stop: .env is tracked. Do not publish." }
 
 if ($SkipGitHub) {
@@ -143,3 +147,4 @@ Write-Host "JUnit report: artifacts\pytest-junit.xml"
 git status --short
 git log --oneline --max-count=8
 git remote -v
+
