@@ -124,7 +124,6 @@ $TrackedEnv = @(git ls-files -- .env)
 if ($TrackedEnv -contains ".env") {
     throw ".env is tracked by Git. Stop before publishing to protect secrets."
 }
-if ($LASTEXITCODE -eq 0) { throw "Safety stop: .env is tracked. Do not publish." }
 
 if ($SkipGitHub) {
     Write-Host "`nLocal tests and artifacts are ready. GitHub publishing skipped." -ForegroundColor Green
@@ -146,5 +145,7 @@ Write-Host "JUnit report: artifacts\pytest-junit.xml"
 git status --short
 git log --oneline --max-count=8
 git remote -v
+
+
 
 
